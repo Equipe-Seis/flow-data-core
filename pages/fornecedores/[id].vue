@@ -3,7 +3,7 @@
     <h1>Editar Fornecedor</h1>
 
     <v-form ref="form" @submit.prevent="onSubmit" v-model="valid" lazy-validation>
-      <!-- Tipo -->
+      <!-- Tipo de Pessoa -->
       <v-select
         v-model="fornecedor.tipoPessoa"
         :items="tiposPessoa"
@@ -87,7 +87,6 @@
         @blur="consultarCep"
         :rules="[v => !!v || 'CEP obrigatório']"
       />
-
       <v-text-field v-model="fornecedor.logradouro" label="Logradouro" />
       <v-text-field v-model="fornecedor.bairro" label="Bairro" />
 
@@ -155,6 +154,20 @@ const fornecedor = reactive({
 const validateCNPJ = (v) => {
   const cnpjLimpo = v?.replace(/\D/g, '');
   return /^\d{14}$/.test(cnpjLimpo) || 'CNPJ deve conter 14 números';
+};
+
+// Função para formatar data no formato BR
+const formatDateBR = (date) => {
+  if (!date) return '';
+  const [year, month, day] = date.split('-');
+  return `${day}/${month}/${year}`;
+};
+
+// Função para converter data para o formato ISO
+const convertToISO = (date) => {
+  if (!date) return '';
+  const [day, month, year] = date.split('/');
+  return `${year}-${month}-${day}`;
 };
 
 const consultarCnpj = async () => {
@@ -238,18 +251,7 @@ const onEstadoChange = async (uf) => {
   }
 };
 
-const resetPessoa = () => {
-  fornecedor.nome = '';
-  fornecedor.cpf = '';
-  fornecedor.cnpj = '';
-  fornecedor.fantasia = '';
-  fornecedor.abertura = '';
-  fornecedor.situacao = '';
-  fornecedor.tipo = '';
-  fornecedor.porte = '';
-  fornecedor.natureza_juridica = '';
-};
-
+// Ao carregar o fornecedor
 onMounted(async () => {
   const id = route.params.id;
   await carregarEstados();
@@ -257,6 +259,15 @@ onMounted(async () => {
   try {
     const data = await $fetch(`/api/fornecedores/${id}`);
     Object.assign(fornecedor, data);
+
+    // Convertendo datas para o formato BR
+    if (fornecedor.dataNascimento) {
+      fornecedor.dataNascimento = formatDateBR(fornecedor.dataNascimento);
+    }
+    if (fornecedor.abertura) {
+      fornecedor.abertura = formatDateBR(fornecedor.abertura);
+    }
+
     if (fornecedor.uf) await onEstadoChange(fornecedor.uf);
   } catch (err) {
     erro.value = 'Erro ao carregar fornecedor.';
@@ -268,6 +279,10 @@ const onSubmit = async () => {
   if (!form.value.validate()) return;
 
   try {
+    // Converter as datas para o formato ISO antes de salvar
+    fornecedor.dataNascimento = convertToISO(fornecedor.dataNascimento);
+    fornecedor.abertura = convertToISO(fornecedor.abertura);
+
     await $fetch(`/api/fornecedores/${fornecedor.id}`, {
       method: 'PUT',
       body: { ...fornecedor },

@@ -1,29 +1,78 @@
-import { readFile, writeFile } from 'fs/promises'
-import { join } from 'path'
+import prisma from '../prisma'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const filePath = join(process.cwd(), 'data', 'fornecedores.json')
 
-  let fornecedores = []
+  let dataNascimento = null
+  let abertura = null
 
-  try {
-    const data = await readFile(filePath, 'utf-8')
-    fornecedores = JSON.parse(data)
-  } catch {
-    // arquivo pode não existir, criar um array vazio
-    fornecedores = []
+  const convertToISO = (dataBr: string) => {
+    const [day, month, year] = dataBr.split('/').map(Number)
+    return new Date(year, month - 1, day).toISOString() // Subtrai 1 do mês porque o JavaScript usa base 0
   }
 
-  // Descobre o maior id existente
-  const maiorId = fornecedores.reduce((max, f) => f.id > max ? f.id : max, 0)
+  if (body.tipoPessoa === 'Física' && body.dataNascimento) {
+    try {
+      dataNascimento = convertToISO(body.dataNascimento) // Converte a data para ISO-8601
+    } catch (error) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Formato de data de nascimento inválido. Use o formato DD/MM/YYYY.',
+      })
+    }
+  }
 
-  // Adiciona o novo fornecedor com id incremental
-  const novoFornecedor = { id: maiorId + 1, ...body }
+  if (body.tipoPessoa === 'Jurídica' && !body.abertura) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Abertura é um campo obrigatório para pessoa jurídica.',
+    })
+  } else if (body.tipoPessoa === 'Jurídica' && body.abertura) {
+    abertura = body.abertura
+    try {
+      abertura = convertToISO(body.abertura) // Converte a data para ISO-8601
+    } catch (error) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Formato de data de abertura inválido. Use o formato DD/MM/YYYY.',
+      })
+    }
 
-  fornecedores.push(novoFornecedor)
+  }
 
-  await writeFile(filePath, JSON.stringify(fornecedores, null, 2), 'utf-8')
+  try {
+    // Cria um novo fornecedor no banco de dados usando Prisma
+    const novoFornecedor = await prisma.fornecedor.create({
+      data: {
+        tipoPessoa: body.tipoPessoa,
+        nome: body.nome,
+        cpf: body.cpf,
+        dataNascimento: dataNascimento,
+        telefone: body.telefone,
+        cnpj: body.cnpj,
+        fantasia: body.fantasia,
+        abertura: abertura,
+        situacao: body.situacao,
+        tipo: body.tipo,
+        porte: body.porte,
+        natureza_juridica: body.natureza_juridica,
+        cep: body.cep,
+        logradouro: body.logradouro,
+        bairro: body.bairro,
+        localidade: body.localidade,
+        uf: body.uf,
+      }
+    })
 
-  return novoFornecedor
+    // Retorna o novo fornecedor criado
+    return novoFornecedor
+  } catch (err) {
+    console.error('Erro ao salvar fornecedor no banco:', err)
+
+    // Cria um erro 500
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Erro ao salvar fornecedor no banco de dados',
+    })
+  }
 })

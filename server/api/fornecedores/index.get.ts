@@ -1,17 +1,28 @@
-import { readFile } from 'fs/promises';
-import { join } from 'path';
+import prisma from '../prisma'
 
 export default defineEventHandler(async () => {
-  const filePath = join(process.cwd(), 'data', 'fornecedores.json');
-
   try {
-    const fileData = await readFile(filePath, 'utf-8');
-    return JSON.parse(fileData);
+    // Simples consulta para garantir que o Prisma está funcionando
+    const fornecedores = await prisma.fornecedor.findMany()
+    
+    // Se não encontrar nenhum fornecedor, talvez o erro seja outra coisa
+    if (fornecedores.length === 0) {
+      console.warn('Nenhum fornecedor encontrado no banco de dados.')
+    }
+
+    return fornecedores
   } catch (err) {
-    console.error('Erro ao ler fornecedores:', err);
+    console.error('Erro ao carregar fornecedores:', err)
+
+    // Detalhando mais o erro
+    if (err instanceof Error) {
+      console.error('Detalhes do erro:', err.message, err.stack)
+    }
+
+    // Se houver erro, cria uma resposta de erro com o detalhe
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erro ao carregar fornecedores',
-    });
+      statusMessage: 'Erro ao carregar fornecedores do banco de dados',
+    })
   }
-});
+})
