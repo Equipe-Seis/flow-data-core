@@ -8,12 +8,12 @@ export default defineEventHandler(async (event) => {
 
   const convertToISO = (dataBr: string) => {
     const [day, month, year] = dataBr.split('/').map(Number)
-    return new Date(year, month - 1, day).toISOString() // Subtrai 1 do mês porque o JavaScript usa base 0
+    return new Date(year, month - 1, day).toISOString() 
   }
 
   if (body.tipoPessoa === 'Física' && body.dataNascimento) {
     try {
-      dataNascimento = convertToISO(body.dataNascimento) // Converte a data para ISO-8601
+      dataNascimento = convertToISO(body.dataNascimento) 
     } catch (error) {
       throw createError({
         statusCode: 400,
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
   } else if (body.tipoPessoa === 'Jurídica' && body.abertura) {
     abertura = body.abertura
     try {
-      abertura = convertToISO(body.abertura) // Converte a data para ISO-8601
+      abertura = convertToISO(body.abertura) 
     } catch (error) {
       throw createError({
         statusCode: 400,
@@ -41,7 +41,6 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Cria um novo fornecedor no banco de dados usando Prisma
     const novoFornecedor = await prisma.fornecedor.create({
       data: {
         tipoPessoa: body.tipoPessoa,
@@ -61,15 +60,14 @@ export default defineEventHandler(async (event) => {
         bairro: body.bairro,
         localidade: body.localidade,
         uf: body.uf,
+        email: body.email,
       }
     })
 
-    // Retorna o novo fornecedor criado
     return novoFornecedor
   } catch (err) {
     console.error('Erro ao salvar fornecedor no banco:', err)
 
-    // Cria um erro 500
     throw createError({
       statusCode: 500,
       statusMessage: 'Erro ao salvar fornecedor no banco de dados',

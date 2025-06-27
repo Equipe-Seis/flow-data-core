@@ -26,6 +26,13 @@
           </v-list-item-content>
         </v-list-item>
 
+        <v-list-item to="/insumos/insumos" link>
+          <v-list-item-icon><v-icon>mdi-package-variant</v-icon></v-list-item-icon>
+          <v-list-item-content v-if="!mini">
+            <v-list-item-title>Insumos</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
         <v-list-item @click="logout" link>
           <v-list-item-icon><v-icon>mdi-logout</v-icon></v-list-item-icon>
           <v-list-item-content v-if="!mini">

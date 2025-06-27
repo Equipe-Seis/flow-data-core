@@ -1,17 +1,54 @@
 import prisma from '../prisma'
 
 export default defineEventHandler(async (event) => {
-  // Obtém o ID do fornecedor a partir dos parâmetros da URL
   const { id } = event.context.params!
   
-  // Obtém os dados enviados no corpo da requisição
   const body = await readBody(event)
 
+  let dataNascimento = null
+  let abertura = null
+
+  const convertToISO = (dataBr: string) => {
+    const [day, month, year] = dataBr.split('/').map(Number)
+    return new Date(year, month - 1, day).toISOString() 
+  }
+
+  if (body.tipoPessoa === 'Física' && body.dataNascimento) {
+    try {
+      dataNascimento = convertToISO(body.dataNascimento) 
+    } catch (error) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Formato de data de nascimento inválido. Use o formato DD/MM/YYYY.',
+      })
+    }
+  }
+
+  if (body.tipoPessoa === 'Jurídica' && !body.abertura) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Abertura é um campo obrigatório para pessoa jurídica.',
+    })
+  } else if (body.tipoPessoa === 'Jurídica' && body.abertura) {
+    abertura = body.abertura
+    try {
+      abertura = convertToISO(body.abertura) 
+    } catch (error) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Formato de data de abertura inválido. Use o formato DD/MM/YYYY.',
+      })
+    }
+
+  }
+
+  body.dataNascimento = dataNascimento;
+  body.abertura = abertura;
+
   try {
-    // Verifica se o fornecedor existe
     const fornecedorExistente = await prisma.fornecedor.findUnique({
       where: {
-        id: Number(id), // Converte o ID para número caso seja uma string
+        id: Number(id), 
       }
     })
 
@@ -19,22 +56,18 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 404, statusMessage: 'Fornecedor não encontrado' })
     }
 
-    // Atualiza o fornecedor no banco de dados com os dados enviados
     const fornecedorAtualizado = await prisma.fornecedor.update({
       where: {
-        id: Number(id), // Converte o ID para número
+        id: Number(id),
       },
       data: {
-        ...body, // Atualiza os campos com os dados recebidos
+        ...body,
       }
     })
 
-    // Retorna o fornecedor atualizado
     return fornecedorAtualizado
   } catch (err) {
-    console.error('Erro ao atualizar fornecedor:', err)
-
-    // Caso ocorra algum erro, retorna erro 500
+    
     throw createError({ statusCode: 500, statusMessage: 'Erro ao atualizar fornecedor' })
   }
 })

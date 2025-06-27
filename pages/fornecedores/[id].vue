@@ -2,6 +2,8 @@
   <v-container>
     <h1>Editar Fornecedor</h1>
 
+    <v-alert v-if="erro" type="error" class="mt-2">{{ erro }}</v-alert>
+
     <v-form ref="form" @submit.prevent="onSubmit" v-model="valid" lazy-validation>
       <!-- Tipo de Pessoa -->
       <v-select
@@ -15,12 +17,7 @@
 
       <!-- Pessoa Física -->
       <template v-if="fornecedor.tipoPessoa === 'Física'">
-        <v-text-field
-          v-model="fornecedor.nome"
-          label="Nome"
-          :rules="[v => !!v || 'Nome é obrigatório']"
-          required
-        />
+        <v-text-field v-model="fornecedor.nome" label="Nome" :rules="[v => !!v || 'Nome é obrigatório']" required />
         <v-text-field
           v-model="fornecedor.cpf"
           label="CPF"
@@ -28,17 +25,8 @@
           :rules="[v => /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(v) || 'CPF inválido']"
           required
         />
-        <v-text-field
-          v-model="fornecedor.dataNascimento"
-          label="Data de Nascimento"
-          v-mask="'##/##/####'"
-          required
-        />
-        <v-text-field
-          v-model="fornecedor.telefone"
-          label="Telefone"
-          v-mask="'(##) #####-####'"
-        />
+        <v-text-field v-model="fornecedor.dataNascimento" label="Data de Nascimento" v-mask="'##/##/####'" required />
+        <v-text-field v-model="fornecedor.telefone" label="Telefone" v-mask="'(##) #####-####'" />
       </template>
 
       <!-- Pessoa Jurídica -->
@@ -49,27 +37,16 @@
           v-mask="'##.###.###/####-##'"
           :rules="[validateCNPJ]"
           required
-        />
-        <v-btn @click="consultarCnpj" :loading="carregando" color="primary">
-          Consultar CNPJ
-        </v-btn>
-        <v-alert v-if="erro" type="error" class="mt-2">{{ erro }}</v-alert>
-
-        <v-text-field
-          v-model="fornecedor.nome"
-          label="Razão Social"
-          readonly
-        />
-        <v-text-field
-          v-model="fornecedor.fantasia"
-          label="Nome Fantasia"
-          readonly
-        />
-        <v-text-field
-          v-model="fornecedor.telefone"
-          label="Telefone"
-          v-mask="'(##) #####-####'"
-        />
+        >
+          <template #append-inner>
+            <v-btn @click="consultarCnpj" :loading="carregando" color="primary" aria-label="Consultar CNPJ">
+              <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+          </template>
+        </v-text-field>
+        <v-text-field v-model="fornecedor.nome" label="Razão Social" readonly />
+        <v-text-field v-model="fornecedor.fantasia" label="Nome Fantasia" readonly />
+        <v-text-field v-model="fornecedor.telefone" label="Telefone" v-mask="'(##) #####-####'" />
         <v-text-field v-model="fornecedor.abertura" label="Data de Abertura" readonly />
         <v-text-field v-model="fornecedor.situacao" label="Situação" readonly />
         <v-text-field v-model="fornecedor.tipo" label="Tipo" readonly />
@@ -77,16 +54,25 @@
         <v-text-field v-model="fornecedor.natureza_juridica" label="Natureza Jurídica" readonly />
       </template>
 
+      <v-text-field
+        v-model="fornecedor.email"
+        label="E-mail"
+        type="email"
+        :rules="[validarEmail]"
+        required
+        clearable
+      />
+
       <hr class="my-4" />
 
       <!-- Endereço -->
-      <v-text-field
-        v-model="fornecedor.cep"
-        label="CEP"
-        v-mask="'#####-###'"
-        @blur="consultarCep"
-        :rules="[v => !!v || 'CEP obrigatório']"
-      />
+      <v-text-field v-model="fornecedor.cep" label="CEP" v-mask="'#####-###'" :rules="[v => !!v || 'CEP obrigatório']">
+        <template #append-inner>
+          <v-btn @click="consultarCep" :loading="carregando" color="primary" aria-label="Consultar CEP">
+            <v-icon>mdi-magnify</v-icon>
+          </v-btn>
+        </template>
+      </v-text-field>
       <v-text-field v-model="fornecedor.logradouro" label="Logradouro" />
       <v-text-field v-model="fornecedor.bairro" label="Bairro" />
 
@@ -114,21 +100,21 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, reactive, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-const route = useRoute();
-const router = useRouter();
+const route = useRoute()
+const router = useRouter()
 
-const tiposPessoa = ['Física', 'Jurídica'];
-const estados = ref([]);
-const cidades = ref([]);
-const cidadeDisabled = ref(true);
+const tiposPessoa = ['Física', 'Jurídica']
+const estados = ref([])
+const cidades = ref([])
+const cidadeDisabled = ref(true)
 
-const valid = ref(false);
-const form = ref(null);
-const erro = ref('');
-const carregando = ref(false);
+const valid = ref(false)
+const form = ref(null)
+const erro = ref('')
+const carregando = ref(false)
 
 const fornecedor = reactive({
   id: null,
@@ -148,151 +134,82 @@ const fornecedor = reactive({
   logradouro: '',
   bairro: '',
   localidade: '',
-  uf: ''
-});
+  uf: '',
+  email: '',
+})
 
-const validateCNPJ = (v) => {
-  const cnpjLimpo = v?.replace(/\D/g, '');
-  return /^\d{14}$/.test(cnpjLimpo) || 'CNPJ deve conter 14 números';
-};
+const validarEmail = v => (!!v && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) || 'E-mail inválido'
+const validateCNPJ = v => (/^\d{14}$/.test(v?.replace(/\D/g, ''))) || 'CNPJ deve conter 14 números'
 
-// Função para formatar data no formato BR
-const formatDateBR = (date) => {
-  if (!date) return '';
-  const [year, month, day] = date.split('-');
-  return `${day}/${month}/${year}`;
-};
-
-// Função para converter data para o formato ISO
-const convertToISO = (date) => {
-  if (!date) return '';
-  const [day, month, year] = date.split('/');
-  return `${year}-${month}-${day}`;
-};
-
-const consultarCnpj = async () => {
-  erro.value = '';
-  carregando.value = true;
-
-  const cnpjLimpo = fornecedor.cnpj.replace(/\D/g, '');
-  if (!/^\d{14}$/.test(cnpjLimpo)) {
-    erro.value = 'CNPJ inválido.';
-    carregando.value = false;
-    return;
-  }
-
-  try {
-    const data = await $fetch(`/api/cnpj/${cnpjLimpo}`);
-    fornecedor.nome = data.nome || '';
-    fornecedor.fantasia = data.fantasia || '';
-    fornecedor.telefone = data.telefone || '';
-    fornecedor.abertura = data.abertura || '';
-    fornecedor.situacao = data.situacao || '';
-    fornecedor.tipo = data.tipo || '';
-    fornecedor.porte = data.porte || '';
-    fornecedor.natureza_juridica = data.natureza_juridica || '';
-  } catch (e) {
-    erro.value = 'Erro ao consultar a ReceitaWS.';
-    console.error(e);
-  } finally {
-    carregando.value = false;
-  }
-};
-
-const consultarCep = async () => {
-  const cepLimpo = fornecedor.cep.replace(/\D/g, '');
-  if (!/^\d{8}$/.test(cepLimpo)) {
-    erro.value = 'CEP inválido.';
-    return;
-  }
-
-  try {
-    const data = await $fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-    if (data.erro) {
-      erro.value = 'CEP não encontrado.';
-      return;
-    }
-
-    fornecedor.logradouro = data.logradouro || '';
-    fornecedor.bairro = data.bairro || '';
-    fornecedor.uf = data.uf || '';
-    await onEstadoChange(fornecedor.uf);
-    fornecedor.localidade = data.localidade || '';
-  } catch (e) {
-    erro.value = 'Erro ao consultar o CEP.';
-    console.error(e);
-  }
-};
+const formatDateBR = iso => {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return [d.getDate(), d.getMonth() + 1, d.getFullYear()].map(n => String(n).padStart(2, '0')).join('/')
+}
 
 const carregarEstados = async () => {
   try {
-    const data = await $fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados');
-    estados.value = data.sort((a, b) => a.nome.localeCompare(b.nome));
-  } catch (err) {
-    erro.value = 'Erro ao carregar estados.';
-    console.error(err);
+    const data = await $fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
+    estados.value = data.sort((a, b) => a.nome.localeCompare(b.nome))
+  } catch {
+    erro.value = 'Erro ao carregar estados.'
   }
-};
+}
 
-const onEstadoChange = async (uf) => {
-  fornecedor.localidade = '';
-  cidades.value = [];
-  cidadeDisabled.value = true;
-
-  if (!uf) return;
-
+const onEstadoChange = async uf => {
+  fornecedor.localidade = ''
+  cidades.value = []
+  cidadeDisabled.value = true
+  if (!uf) return
   try {
-    const data = await $fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
-    cidades.value = data.sort((a, b) => a.nome.localeCompare(b.nome));
-    cidadeDisabled.value = false;
-  } catch (err) {
-    erro.value = 'Erro ao carregar cidades.';
-    console.error(err);
+    const data = await $fetch(
+      `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`
+    )
+    cidades.value = data.sort((a, b) => a.nome.localeCompare(b.nome))
+    cidadeDisabled.value = false
+  } catch {
+    erro.value = 'Erro ao carregar cidades.'
   }
-};
+}
 
-// Ao carregar o fornecedor
 onMounted(async () => {
-  const id = route.params.id;
-  await carregarEstados();
-
+  await carregarEstados()
   try {
-    const data = await $fetch(`/api/fornecedores/${id}`);
-    Object.assign(fornecedor, data);
+    const data = await $fetch(`/api/fornecedores/${route.params.id}`)
+    console.log('Dados caixa da API:', data)
 
-    // Convertendo datas para o formato BR
-    if (fornecedor.dataNascimento) {
-      fornecedor.dataNascimento = formatDateBR(fornecedor.dataNascimento);
-    }
-    if (fornecedor.abertura) {
-      fornecedor.abertura = formatDateBR(fornecedor.abertura);
-    }
+    Object.assign(fornecedor, data)
+    fornecedor.dataNascimento = formatDateBR(data.dataNascimento)
+    fornecedor.abertura = formatDateBR(data.abertura)
 
-    if (fornecedor.uf) await onEstadoChange(fornecedor.uf);
+    if (data.uf) {
+      await onEstadoChange(data.uf)
+
+      const cidadeApi = data.localidade
+      const encontrada = cidades.value.find(c => c.nome === cidadeApi)
+      if (encontrada) {
+        fornecedor.localidade = cidadeApi
+      } else {
+        console.warn(`Cidade não encontrada na lista: "${cidadeApi}" para UF "${data.uf}"`)
+      }
+    }
   } catch (err) {
-    erro.value = 'Erro ao carregar fornecedor.';
-    console.error(err);
+    erro.value = 'Erro ao carregar fornecedor.'
+    console.error(err)
   }
-});
+})
+
 
 const onSubmit = async () => {
-  if (!form.value.validate()) return;
-
+  if (!form.value.validate()) return
   try {
-    // Converter as datas para o formato ISO antes de salvar
-    fornecedor.dataNascimento = convertToISO(fornecedor.dataNascimento);
-    fornecedor.abertura = convertToISO(fornecedor.abertura);
-
     await $fetch(`/api/fornecedores/${fornecedor.id}`, {
       method: 'PUT',
       body: { ...fornecedor },
-    });
-
-    alert('Fornecedor atualizado com sucesso!');
-    router.push('/fornecedores/fornecedores');
-  } catch (err) {
-    erro.value = 'Erro ao salvar alterações.';
-    console.error(err);
+    })
+    router.push('/fornecedores/fornecedores')
+  } catch {
+    erro.value = 'Erro ao salvar alterações.'
   }
-};
+}
 </script>

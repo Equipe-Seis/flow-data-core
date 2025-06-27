@@ -2,6 +2,8 @@
   <v-container>
     <h1>Cadastro de Fornecedores</h1>
 
+    <v-alert v-if="erro" type="error" class="mt-2">{{ erro }}</v-alert>
+    <br> 
     <v-form ref="form" @submit.prevent="onSubmit" v-model="valid" lazy-validation>
       <!-- Tipo -->
       <v-select
@@ -48,11 +50,15 @@
           v-mask="'##.###.###/####-##'"
           :rules="[validateCNPJ]"
           required
-        />
-        <v-btn @click="consultarCnpj" :loading="carregando" color="primary">
-          Consultar CNPJ
-        </v-btn>
-        <v-alert v-if="erro" type="error" class="mt-2">{{ erro }}</v-alert>
+        >
+          <template #append-inner>
+            <v-btn  @click="consultarCnpj" :loading="carregando" color="primary" aria-label="Consultar CNPJ">
+              <v-icon>mdi-magnify</v-icon>
+            </v-btn>
+          </template>
+        </v-text-field>
+        
+        
 
         <v-text-field
           v-model="fornecedor.nome"
@@ -96,31 +102,48 @@
         />
       </template>
 
+    
+      <v-text-field
+        v-model="fornecedor.email"
+        label="E-mail"
+        type="email"
+        :rules="[validarEmail]"
+        required
+        clearable
+      />
+   
+
       <hr />
 
       <v-text-field
         v-model="fornecedor.cep"
         label="CEP"
         v-mask="'#####-###'"
-        @blur="consultarCep"
+        
         :rules="[v => !!v || 'CEP obrigatório']"
+      >
+        <template #append-inner>
+          <v-btn  @click="consultarCep" :loading="carregando" color="primary" aria-label="Consultar CEP">
+            <v-icon>mdi-magnify</v-icon>
+          </v-btn>
+        </template>
+      </v-text-field>
+
+      <v-select
+        v-model="fornecedor.uf"
+        :items="estados.map(e => e.sigla)"
+        label="UF"
+        :rules="[v => !!v || 'UF obrigatório']"
+        @update:modelValue="onEstadoChange"
       />
 
-<v-select
-  v-model="fornecedor.uf"
-  :items="estados.map(e => e.sigla)"
-  label="UF"
-  :rules="[v => !!v || 'UF obrigatório']"
-  @update:modelValue="onEstadoChange"
-/>
-
-    <v-select
-    v-model="fornecedor.localidade"
-    :items="cidades.map(c => c.nome)"
-    label="Cidade"
-    :disabled="cidadeDisabled"
-    :rules="[v => !!v || 'Cidade obrigatória']"
-    />
+      <v-select
+        v-model="fornecedor.localidade"
+        :items="cidades.map(c => c.nome)"
+        label="Cidade"
+        :disabled="cidadeDisabled"
+        :rules="[v => !!v || 'Cidade obrigatória']"
+      />
 
       <v-text-field
         v-model="fornecedor.logradouro"
@@ -141,18 +164,6 @@
       </v-btn>
     </v-form>
 
-    <!-- Lista -->
-    <v-list subheader class="mt-5">
-      <v-subheader>Fornecedores Cadastrados</v-subheader>
-      <v-list-item v-for="(f, i) in fornecedores" :key="i">
-        <v-list-item-content>
-          <v-list-item-title>{{ f.nome }}</v-list-item-title>
-          <v-list-item-subtitle>
-            {{ f.tipoPessoa }} - {{ f.cnpj || f.cpf || '-' }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list>
   </v-container>
 </template>
 
@@ -165,6 +176,13 @@ const form = ref(null);
 const valid = ref(false);
 const carregando = ref(false);
 const erro = ref('');
+const email = ref('');
+
+const validarEmail = (v) => {
+  if (!v) return 'E-mail é obrigatório.';
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(v) || 'E-mail inválido.';
+};
 
 const fornecedor = reactive({
   tipoPessoa: 'Física',
@@ -184,6 +202,7 @@ const fornecedor = reactive({
   bairro: '',
   localidade: '',
   uf: '',
+  email:'',
 });
 
 const estados = ref([]);
@@ -201,6 +220,7 @@ const consultarCnpj = async () => {
 
   const cnpjLimpo = fornecedor.cnpj.replace(/\D/g, '');
 
+  // Validação básica do CNPJ antes da requisição
   if (!/^\d{14}$/.test(cnpjLimpo)) {
     erro.value = 'CNPJ inválido.';
     carregando.value = false;
@@ -210,6 +230,13 @@ const consultarCnpj = async () => {
   try {
     const data = await $fetch(`/api/cnpj/${cnpjLimpo}`);
 
+    
+    if (data.status === 'ERROR') {
+      erro.value = data.message || 'Erro ao consultar CNPJ.';
+      return;
+    }
+
+    
     fornecedor.nome = data.nome || '';
     fornecedor.fantasia = data.fantasia || '';
     fornecedor.telefone = data.telefone || '';
@@ -295,30 +322,7 @@ const onSubmit = async () => {
       method: 'POST',
       body: { ...fornecedor },
     });
-
-    alert('Fornecedor salvo com sucesso!');
-    //fornecedores.value.push({ ...fornecedor });
     router.push('/fornecedores/fornecedores')
-    // Resetar campos
-    /*Object.assign(fornecedor, {
-      tipoPessoa: 'Física',
-      nome: '',
-      cpf: '',
-      dataNascimento: '',
-      telefone: '',
-      cnpj: '',
-      fantasia: '',
-      abertura: '',
-      situacao: '',
-      tipo: '',
-      porte: '',
-      natureza_juridica: '',
-      cep: '',
-      logradouro: '',
-      bairro: '',
-      localidade: '',
-      uf: '',
-    });*/
   } catch (err) {
     erro.value = 'Erro ao salvar fornecedor.';
     console.error(err);
