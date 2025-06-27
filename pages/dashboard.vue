@@ -4,11 +4,13 @@
     <v-card-text>Bem-vindo ao painel administrativo.</v-card-text>
 
     <FornecedorContador />
+    <InsumosContador />
   </v-card>
 </template>
 
 <script setup>
 import FornecedorContador from '~/components/FornecedorContador.vue'
+import InsumosContador from '~/components/InsumosContador.vue'
 definePageMeta({
   layout: 'default',
   middleware: 'auth'
