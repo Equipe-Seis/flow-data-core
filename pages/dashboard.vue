@@ -10,7 +10,7 @@
 
 <script setup>
 import FornecedorContador from '~/components/FornecedorContador.vue'
-import InsumosContador from '~/components/InsumosContador.vue'
+import InsumosContador from '~/components/InsumoContador.vue'
 definePageMeta({
   layout: 'default',
   middleware: 'auth'
