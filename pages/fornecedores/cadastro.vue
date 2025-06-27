@@ -169,6 +169,10 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
 
 const tiposPessoa = ['Física', 'Jurídica'];
 const fornecedores = ref([]);

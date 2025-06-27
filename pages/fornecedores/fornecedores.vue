@@ -13,6 +13,12 @@
           :items-per-page="5"
           class="elevation-1"
         >
+          <template #item.cnpj="{ item }">
+            <span>
+              {{ item.tipoPessoa === 'Física' ? item.cpf :item.cnpj}}
+            </span>
+          </template>
+        
           <template #item.actions="{ item }">
             <v-btn size="small" color="primary" @click="editarFornecedor(item.id)">
               Editar

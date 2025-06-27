@@ -176,8 +176,7 @@ onMounted(async () => {
   await carregarEstados()
   try {
     const data = await $fetch(`/api/fornecedores/${route.params.id}`)
-    console.log('Dados caixa da API:', data)
-
+   
     Object.assign(fornecedor, data)
     fornecedor.dataNascimento = formatDateBR(data.dataNascimento)
     fornecedor.abertura = formatDateBR(data.abertura)
