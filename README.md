@@ -1,75 +1,71 @@
-# Nuxt Minimal Starter
+# 🌐 Projeto Fullstack com Nuxt 3, API interna, Vuetify e Prisma
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Projeto fullstack utilizando **Nuxt 3**, com:
 
-## Setup
+- ⚙️ Frontend em Vue 3 (Composition API)
+- 📡 Backend (API interna via `/server/api`)
+- 🎨 UI com Vuetify 3
+- 🗄️ ORM com Prisma e banco PostgreSQL (via Supabase)
+- 📦 Gerenciador de pacotes: `npm`
 
-Make sure to install dependencies:
+---
+
+## 🚀 Tecnologias utilizadas
+
+- [Nuxt 3](https://nuxt.com)
+- [Vuetify 3](https://next.vuetifyjs.com/)
+- [Prisma ORM](https://www.prisma.io/)
+- [PostgreSQL (via Supabase)](https://supabase.com/)
+- [Vercel (Deploy)](https://vercel.com)
+
+---
+
+## 📁 Estrutura do projeto
 
 ```bash
-# npm
+.
+├── app.vue               # Componente raiz
+├── pages/                # Rotas da aplicação (SSR/SPA)
+├── server/
+│   └── api/              # Rotas da API interna (ex: /api/hello)
+├── prisma/
+│   ├── schema.prisma     # Modelo do banco
+│   └── migrations/       # Migrações
+├── composables/          # Funções reutilizáveis (useXYZ)
+├── plugins/              # Plugins Nuxt (ex: Vuetify)
+├── nuxt.config.ts        # Configuração principal do Nuxt
+├── .env.example          # Exemplo de variáveis de ambiente
+├── README.md             # Documentação do projeto
+
+```
+
+## 📁 Como rodar o projeto localmente
+
+```bash
+1. Clone o repositório
+git clone https://github.com/sua-organizacao/nome-do-repositorio.git
+cd nome-do-repositorio
+
+2. Instale as dependências
 npm install
 
-# pnpm
-pnpm install
+3. Configure o ambiente
+cp .env.example .env
 
-# yarn
-yarn install
+DATABASE_URL=postgresql://usuario:senha@host:5432/nome_do_banco
 
-# bun
-bun install
-```
+4. Configure o Prisma
 
-## Development Server
+npx prisma generate
+npx prisma db push
 
-Start the development server on `http://localhost:3000`:
+ou npx prisma migrate dev se estiver usando migrações
 
-```bash
-# npm
+Rode o projeto em modo desenvolvimento
 npm run dev
 
-# pnpm
-pnpm dev
+http://localhost:3000
 
-# yarn
-yarn dev
-
-# bun
-bun run dev
+usuario:admin@teste.com
+senha:123456
 ```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
