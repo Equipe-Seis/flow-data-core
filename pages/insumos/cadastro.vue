@@ -80,7 +80,6 @@ const onSubmit = async () => {
     router.push('/insumos/insumos');
   } catch (err) {
     erro.value = 'Erro ao salvar insumo.';
-    console.error('Erro no envio:', err);
   }
 };
 </script>

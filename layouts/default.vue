@@ -1,6 +1,5 @@
 <template>
   <v-app>
-    <!-- Navigation Drawer -->
     <v-navigation-drawer
       v-model="drawer"
       app
@@ -42,7 +41,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <!-- App Bar -->
+
     <v-app-bar app color="primary" dark>
       <v-btn icon @click="toggleMini">
         <v-icon>{{ mini ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
@@ -50,7 +49,6 @@
       <v-toolbar-title>Área Administrativa</v-toolbar-title>
     </v-app-bar>
 
-    <!-- Main Content -->
     <v-main>
       <v-container class="pa-4">
         <slot />

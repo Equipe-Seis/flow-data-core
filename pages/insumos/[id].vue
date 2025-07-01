@@ -99,7 +99,7 @@ const onSubmit = async () => {
       method: 'PUT',
       body: { ...insumo },
     });
-    router.push('/insumos/insumos'); // ou a rota de listagem
+    router.push('/insumos/insumos'); 
   } catch (err) {
     erro.value = 'Erro ao salvar alterações.';
     console.error(err);

@@ -44,7 +44,6 @@ const headers = [
   { title: 'Ações', key: 'actions', sortable: false },
 ]
 
-// Navegação
 function goToCadastro() {
   router.push('/insumos/cadastro')
 }
