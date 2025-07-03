@@ -15,15 +15,19 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
         
+enum TipoPessoa {
+  Física
+  Jurídica
+}
 
 model Fornecedor {
   id                Int      @id @default(autoincrement())
-  tipoPessoa        String
+  tipoPessoa        TipoPessoa
   nome              String
-  cpf               String?  // O CPF pode ser nulo
+  cpf               String?  @unique
   dataNascimento    DateTime?
   telefone          String?
-  cnpj              String?  // O CNPJ pode ser nulo
+  cnpj              String?  @unique
   fantasia          String?
   abertura          DateTime?
   situacao          String?
@@ -35,15 +39,17 @@ model Fornecedor {
   bairro            String?
   localidade        String?
   uf                String?
-  email    String?  
+  email    String?  @unique
+  createdAt   DateTime @default(now())
 }
 
 model Insumo {
   id          Int      @id @default(autoincrement())
   nome        String
-  codigo      String
+  codigo      String @unique
   descricao   String?  
   quantidade  Int
   preco       Float
   createdAt   DateTime @default(now())
 }
+
