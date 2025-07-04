@@ -3,6 +3,41 @@ import prisma from "../prisma";
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
+  const tipoPessoa = body.tipoPessoa;
+
+  if (tipoPessoa === 'Física') {
+    const exists = await prisma.fornecedor.findFirst({
+      where: {
+        cpf: body.cpf,
+      },
+    });
+
+    if (exists) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'CPF já cadastrado para outro fornecedor.',
+      });
+    }
+
+    // Garante que CNPJ não será salvo acidentalmente
+    body.cnpj = null;
+  } else if (tipoPessoa === 'Jurídica') {
+    const exists = await prisma.fornecedor.findFirst({
+      where: {
+        cnpj: body.cnpj,
+      },
+    });
+
+    if (exists) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'CNPJ já cadastrado para outro fornecedor.',
+      });
+    }
+
+    body.cpf = null;
+  }
+
   let dataNascimento = null;
   let abertura = null;
 
