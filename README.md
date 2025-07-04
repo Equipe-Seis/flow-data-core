@@ -73,6 +73,21 @@ usuario:admin@teste.com
 senha:123456
 ```
 
+## 🐳 Rodando em docker
+```bash
+cp .env.docker .env
+
+# 3. Suba os containers
+docker compose up -d --build
+
+# 4. Gere o client do Prisma e rode as migrações
+npx prisma generate
+npx prisma migrate dev 
+
+# 5. Rode o dataseed (opcional)
+npm run seed
+```
+
 ## 📦 Projeto: API Local para Cadastro de Fornecedores e Insumos
 
 ```bash
