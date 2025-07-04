@@ -3,29 +3,47 @@
     <v-navigation-drawer
       v-model="drawer"
       app
-      permanent
+      temporary
       :mini-variant="mini"
       width="256"
       mini-variant-width="64"
     >
       <v-list nav dense>
-        <v-list-item-title class="px-4 py-2">Menu</v-list-item-title>
+        <v-list-item class="px-4 py-2">
+          <v-list-item-content>
+            <v-list-item-title class="text-h6" v-if="!mini">Menu</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        
+        <v-divider></v-divider>
 
-        <v-list-item to="/dashboard" link>
+        <v-list-item 
+          to="/dashboard" 
+          link 
+          @click="closeDrawerOnMobile"
+        >
           <v-list-item-icon><v-icon>mdi-view-dashboard</v-icon></v-list-item-icon>
           <v-list-item-content v-if="!mini">
             <v-list-item-title>Dashboard</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item to="/fornecedores/fornecedores" link>
+        <v-list-item 
+          to="/fornecedores/fornecedores" 
+          link 
+          @click="closeDrawerOnMobile"
+        >
           <v-list-item-icon><v-icon>mdi-truck</v-icon></v-list-item-icon>
           <v-list-item-content v-if="!mini">
             <v-list-item-title>Fornecedores</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
 
-        <v-list-item to="/insumos/insumos" link>
+        <v-list-item 
+          to="/insumos/insumos" 
+          link 
+          @click="closeDrawerOnMobile"
+        >
           <v-list-item-icon><v-icon>mdi-package-variant</v-icon></v-list-item-icon>
           <v-list-item-content v-if="!mini">
             <v-list-item-title>Insumos</v-list-item-title>
@@ -41,11 +59,8 @@
       </v-list>
     </v-navigation-drawer>
 
-
     <v-app-bar app color="primary" dark>
-      <v-btn icon @click="toggleMini">
-        <v-icon>{{ mini ? 'mdi-menu-open' : 'mdi-menu' }}</v-icon>
-      </v-btn>
+      <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Área Administrativa</v-toolbar-title>
     </v-app-bar>
 
@@ -58,22 +73,33 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuth } from '~/composables/useAuth'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuth } from '~/composables/useAuth';
+import { useDisplay } from 'vuetify';
 
-const drawer = ref(true)
-const mini = ref(false)
+const router = useRouter();
+const { logout: doLogout } = useAuth();
+const { mobile } = useDisplay();
 
-function toggleMini() {
-  mini.value = !mini.value
+const drawer = ref(false); 
+const mini = ref(false);
+
+function toggleDrawer() {
+  drawer.value = !drawer.value;
 }
 
-const router = useRouter()
-const { logout: doLogout } = useAuth()
+function closeDrawerOnMobile() {
+  if (mobile.value) {
+    drawer.value = false;
+  }
+}
 
 function logout() {
-  doLogout()
-  router.push('/login')
+  doLogout();
+  router.push('/login');
 }
 </script>
+
+<style scoped>
+</style>

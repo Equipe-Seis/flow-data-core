@@ -1,43 +1,36 @@
-import prisma from '../prisma'
+import prisma from "../prisma";
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
+  const body = await readBody(event);
 
-  let dataNascimento = null
-  let abertura = null
+  let dataNascimento = null;
+  let abertura = null;
 
   const convertToISO = (dataBr: string) => {
-    const [day, month, year] = dataBr.split('/').map(Number)
-    return new Date(year, month - 1, day).toISOString() 
-  }
-
-  if (body.tipoPessoa === 'Física' && body.dataNascimento) {
     try {
-      dataNascimento = convertToISO(body.dataNascimento) 
+      const [day, month, year] = dataBr.split("/").map(Number);
+      return new Date(year, month - 1, day).toISOString();
     } catch (error) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Formato de data de nascimento inválido. Use o formato DD/MM/YYYY.',
-      })
+        statusMessage: "Formato de data inválido. Use o formato DD/MM/YYYY.",
+      });
     }
+  };
+
+  if (body.tipoPessoa === "Física" && body.dataNascimento) {
+    dataNascimento = convertToISO(body.dataNascimento);
   }
 
-  if (body.tipoPessoa === 'Jurídica' && !body.abertura) {
+  if (body.tipoPessoa === "Jurídica" && !body.abertura) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'Abertura é um campo obrigatório para pessoa jurídica.',
-    })
-  } else if (body.tipoPessoa === 'Jurídica' && body.abertura) {
-    abertura = body.abertura
-    try {
-      abertura = convertToISO(body.abertura) 
-    } catch (error) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Formato de data de abertura inválido. Use o formato DD/MM/YYYY.',
-      })
-    }
+      statusMessage: "Abertura é um campo obrigatório para pessoa jurídica.",
+    });
+  }
 
+  if (body.tipoPessoa === "Jurídica" && body.abertura) {
+    abertura = convertToISO(body.abertura);
   }
 
   try {
@@ -61,16 +54,16 @@ export default defineEventHandler(async (event) => {
         localidade: body.localidade,
         uf: body.uf,
         email: body.email,
-      }
-    })
+      },
+    });
 
-    return novoFornecedor
+    return novoFornecedor;
   } catch (err) {
-    console.error('Erro ao salvar fornecedor no banco:', err)
+    console.error("Erro ao salvar fornecedor no banco:", err);
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erro ao salvar fornecedor no banco de dados',
-    })
+      statusMessage: "Erro ao salvar fornecedor no banco de dados",
+    });
   }
-})
+});

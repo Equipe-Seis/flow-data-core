@@ -30,6 +30,7 @@ Projeto fullstack utilizando **Nuxt 3**, com:
 │   └── api/              # Rotas da API interna (ex: /api/hello)
 ├── prisma/
 │   ├── schema.prisma     # Modelo do banco
+│   ├── seeds             # seeder de banco de dados
 │   └── migrations/       # Migrações
 ├── composables/          # Funções reutilizáveis (useXYZ)
 ├── plugins/              # Plugins Nuxt (ex: Vuetify)
@@ -61,6 +62,8 @@ npx prisma db push
 
 ou npx prisma migrate dev se estiver usando migrações
 
+npm run seed - para rodar as seeds 
+
 Rode o projeto em modo desenvolvimento
 npm run dev
 
@@ -69,3 +72,34 @@ http://localhost:3000
 usuario:admin@teste.com
 senha:123456
 ```
+
+## 🐳 Rodando em docker
+```bash
+cp .env.docker .env
+
+# 3. Suba os containers
+docker compose up -d --build
+
+# 4. Gere o client do Prisma e rode as migrações
+npx prisma generate
+npx prisma migrate dev 
+
+# 5. Rode o dataseed (opcional)
+npm run seed
+```
+
+## 📦 Projeto: API Local para Cadastro de Fornecedores e Insumos
+
+```bash
+
+Esta API local foi desenvolvida para automatizar e padronizar o cadastro de fornecedores (pessoas físicas ou jurídicas) e insumos, utilizando dados oficiais de serviços públicos brasileiros. A aplicação centraliza e valida as informações recebidas por meio de três integrações externas.
+
+🔗 Integrações Utilizadas
+📮 ViaCEP
+Consulta de endereço automático a partir do CEP, preenchendo campos como logradouro, bairro, cidade e UF.
+
+🏛️ ReceitaWS
+Utilizado para buscar e validar informações de empresas com base no CNPJ
+
+📊 IBGE
+Obtenção padronizada de dados de municípios, estados  oficiais IBGE.
