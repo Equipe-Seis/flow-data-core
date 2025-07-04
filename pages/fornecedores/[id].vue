@@ -255,11 +255,12 @@ const consultarCnpj = async () => {
     fornecedor.nome = data.nome || '';
     fornecedor.fantasia = data.fantasia || '';
     fornecedor.telefone = data.telefone || '';
-    fornecedor.abertura = formatDateBR(data.abertura_data) || '';
+    fornecedor.abertura = formatDateBR(data.abertura) || '';
     fornecedor.situacao = data.situacao || '';
     fornecedor.tipo = data.tipo || '';
     fornecedor.porte = data.porte || '';
-    fornecedor.natureza_juridica = data.natureza_juridica?.descricao || '';
+    fornecedor.natureza_juridica =  data.natureza_juridica || ''; 
+    fornecedor.email = data.email || '';
 
     if (data.cep) {
         fornecedor.cep = data.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2');
