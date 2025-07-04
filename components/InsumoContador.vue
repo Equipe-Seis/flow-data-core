@@ -1,9 +1,9 @@
 <template>
-  <v-card class="pa-4 d-flex align-center" elevation="2" style="height: 100px;">
-    <v-avatar color="primary" size="48" class="me-4">
+  <v-card class="pa-4 d-flex flex-wrap justify-center align-center" elevation="2">
+    <v-avatar color="primary" size="48" class="me-4 mb-2 mb-sm-0">
       <v-icon icon="mdi-account-group" />
     </v-avatar>
-    <div>
+    <div class="text-center">
       <div class="text-subtitle-1">Total de Insumos</div>
       <div class="text-h5 font-weight-bold">{{ total }}</div>
     </div>
@@ -24,3 +24,7 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+
+</style>
