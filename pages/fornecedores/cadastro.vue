@@ -332,7 +332,7 @@ const consultarCnpj = async () => {
     fornecedor.fantasia = data.fantasia || '';
     fornecedor.telefone = data.telefone || ''; 
     //fornecedor.abertura = formatDateBR(data.abertura_data) || '';
-    fornecedor.abertura = formatDateBR(data.abertura) || '';
+    fornecedor.abertura = data.abertura || '';
     fornecedor.situacao = data.situacao || '';
     fornecedor.tipo = data.tipo || '';
     fornecedor.porte = data.porte || '';
@@ -340,7 +340,7 @@ const consultarCnpj = async () => {
     fornecedor.email = data.email || '';
     
     if (data.cep) {
-        fornecedor.cep = data.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2'); 
+        fornecedor.cep = data.cep.replace(/\./g, ''); 
         await consultarCep(true); 
     }
   } catch (e) {
