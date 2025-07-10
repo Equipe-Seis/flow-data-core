@@ -1,8 +1,8 @@
 <template>
   <v-container>
-    <h1 class="text-h4 text-sm-h3 text-md-h2 mb-4">Cadastro de Fornecedores</h1>
+    <h1 class="text-h4 mb-4">Cadastro de Fornecedores</h1>
 
-    <v-alert v-if="erro" type="error" class="mb-4">{{ erro }}</v-alert>
+    <v-alert v-if="erro" type="error" class="mb-5">{{ erro }}</v-alert>
 
     <v-form ref="form" @submit.prevent="onSubmit" v-model="valid" lazy-validation>
       <v-select
@@ -205,12 +205,12 @@
         </v-col>
       </v-row>
 
-      <div class="d-flex justify-end mt-6">
-        <v-btn color="secondary" class="me-2" @click="router.back()">
-          Voltar
-        </v-btn>
+      <div class="d-flex justify-end mt-6 ga-4">
         <v-btn type="submit" color="primary" :disabled="!valid" :loading="carregandoSubmit">
           Cadastrar
+        </v-btn>
+        <v-btn color="background text-accent" class="me-2" @click="router.back()">
+          Cancelar
         </v-btn>
       </div>
     </v-form>

@@ -9,8 +9,8 @@
         class="pa-8 rounded-lg elevation-0 custom-card"
       >
         <div class="text-center mb-6">
-          <h1 class="text-h2 font-weight-bold" style="color: #26f964">FlowData</h1>
-          <h2 class="text-h6 font-weight-bold" style="color: #26f964">Bem-vindo(a)!</h2>
+          <h1 class="text-h2 font-weight-bold" style="color: #1FCF54">FlowData</h1>
+          <h2 class="text-h6 font-weight-bold" style="color: #1FCF54">Bem-vindo(a)!</h2>
         </div>
 
         <v-form ref="form" v-model="valid">
@@ -44,7 +44,7 @@
             block
             size="large"
             class="text-white"
-            style="background-color: #26f964;"
+            style="background-color: #1FCF54;"
             @click="login"
           >
             Entrar
