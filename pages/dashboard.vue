@@ -18,7 +18,7 @@
         </v-col>
       </v-row>
 
-      <h2 class="text-h5 mb-4 text-accent">Ações Rápidas</h2>
+      <p class="text-h5 mb-4 text-accent">Ações Rápidas</p>
       <v-row class="mb-6">
         <v-col cols="12" sm="6" md="4">
           <v-btn block color="accent" size="large" to="/fornecedores/cadastro">

@@ -62,7 +62,7 @@
       <v-btn color="primary" type="submit" class="mt-4" :loading="carregando">
         Cadastrar
       </v-btn>
-      <v-btn color="background text-accent" class="mt-4 ms-2" @click="router.back()">
+      <v-btn color="text-accent" class="mt-4 ms-2" @click="router.back()">
         Voltar
       </v-btn>
     </v-form>

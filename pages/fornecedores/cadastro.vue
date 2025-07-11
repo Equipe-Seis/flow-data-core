@@ -209,7 +209,7 @@
         <v-btn type="submit" color="primary" :disabled="!valid" :loading="carregandoSubmit">
           Cadastrar
         </v-btn>
-        <v-btn color="background text-accent" class="me-2" @click="router.back()">
+        <v-btn color="text-accent" class="me-2" @click="router.back()">
           Cancelar
         </v-btn>
       </div>
