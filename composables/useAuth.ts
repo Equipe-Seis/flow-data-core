@@ -1,20 +1,23 @@
+import { useState } from "nuxt/app";
+import { computed } from "vue";
+
 export const useAuth = () => {
-  const user = useState('user', () => null)
+  const user = useState<string | null>("user", () => "");
 
   const login = (email: string, password: string) => {
-    // Simulando usuário fixo
-    if (email === 'admin@teste.com' && password === '123456') {
-      user.value = { email }
-      return true
+    if (email === "admin@teste.com" && password === "123456") {
+      user.value = email;
+      return true;
     }
-    return false
-  }
+
+    return false;
+  };
 
   const logout = () => {
-    user.value = null
-  }
+    user.value = null;
+  };
 
-  const isAuthenticated = computed(() => !!user.value)
+  const isAuthenticated = computed(() => !!user.value);
 
-  return { user, login, logout, isAuthenticated }
-}
+  return { user, login, logout, isAuthenticated };
+};
