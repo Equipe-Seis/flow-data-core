@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1 class="text-h4 text-sm-h3 text-md-h2 mb-4">Cadastro de Insumos</h1>
+    <h1 class="text-h4 mb-4">Cadastro de Insumos</h1>
 
     <v-alert v-if="erro" type="error" class="mb-4">{{ erro }}</v-alert>
 
@@ -62,7 +62,7 @@
       <v-btn color="primary" type="submit" class="mt-4" :loading="carregando">
         Cadastrar
       </v-btn>
-      <v-btn color="secondary" class="mt-4 ms-2" @click="router.back()">
+      <v-btn color="text-accent" class="mt-4 ms-2" @click="router.back()">
         Voltar
       </v-btn>
     </v-form>

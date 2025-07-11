@@ -8,9 +8,9 @@
         width="100%"
         class="pa-8 rounded-lg elevation-0 custom-card"
       >
-        <div class="text-center mb-6">
-          <h1 class="text-h2 font-weight-bold" style="color: #26f964">FlowData</h1>
-          <h2 class="text-h6 font-weight-bold" style="color: #26f964">Bem-vindo(a)!</h2>
+        <div class="text-center text-secondary mb-6">
+          <h1 class="text-h2 font-weight-bold">FlowData</h1>
+          <h2 class="text-h6 font-weight-bold">Bem-vindo(a)!</h2>
         </div>
 
         <v-form ref="form" v-model="valid">
@@ -44,7 +44,7 @@
             block
             size="large"
             class="text-white"
-            style="background-color: #26f964;"
+            style="background-color: #1fcf54"
             @click="login"
           >
             Entrar
@@ -73,52 +73,52 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuth } from '~/composables/useAuth'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuth } from "~/composables/useAuth";
 
-const router = useRouter()
-const { login: tryLogin } = useAuth()
+const router = useRouter();
+const { login: tryLogin } = useAuth();
 
-const email = ref('')
-const password = ref('')
-const remember = ref(true)
-const valid = ref(false)
-const form = ref(null)
+const email = ref("");
+const password = ref("");
+const remember = ref(true);
+const valid = ref(false);
+const form = ref(null);
 
-const dialog = ref(false)
-const dialogMessage = ref('')
+const dialog = ref(false);
+const dialogMessage = ref("");
 
 const emailRules = [
-  v => !v ? 'E-mail é obrigatório' : true,
-  v => !/.+@.+\..+/.test(v) ? 'E-mail inválido' : true
-]
+  (v) => (!v ? "E-mail é obrigatório" : true),
+  (v) => (!/.+@.+\..+/.test(v) ? "E-mail inválido" : true),
+];
 
 const passwordRules = [
-  v => !v ? 'Senha é obrigatória' : true,
-  v => v.length < 6 ? 'Senha deve ter no mínimo 6 caracteres' : true
-]
+  (v) => (!v ? "Senha é obrigatória" : true),
+  (v) => (v.length < 6 ? "Senha deve ter no mínimo 6 caracteres" : true),
+];
 
 async function login() {
-  dialogMessage.value = ''
-  dialog.value = false
+  dialogMessage.value = "";
+  dialog.value = false;
 
-  const { valid: formIsValid } = await form.value.validate()
+  const { valid: formIsValid } = await form.value.validate();
 
   if (formIsValid) {
-    const success = await tryLogin(email.value, password.value)
+    const success = await tryLogin(email.value, password.value);
     if (success) {
-      router.push('/dashboard')
+      router.push("/dashboard");
     } else {
-      dialogMessage.value = 'Credenciais inválidas.'
-      dialog.value = true
+      dialogMessage.value = "Credenciais inválidas.";
+      dialog.value = true;
     }
   }
 }
 
 definePageMeta({
-  layout: false
-})
+  layout: false,
+});
 </script>
 
 <style scoped>
@@ -138,7 +138,7 @@ definePageMeta({
   top: 0;
   height: 100%;
   width: 50%;
-  background-image: url('/icon.png');
+  background-image: url("/icon.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center left;
