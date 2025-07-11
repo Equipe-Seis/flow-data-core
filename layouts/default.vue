@@ -1,62 +1,25 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      v-model="drawer"
-      app
-      temporary
-      :mini-variant="mini"
-      width="256"
-      mini-variant-width="64"
-    >
+    <v-navigation-drawer v-model="drawer" app temporary width="256">
       <v-list nav dense>
-        <v-list-item class="px-4 py-2">
-          <v-list-item-content>
-            <v-list-item-title class="text-h6" v-if="!mini">Menu</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        
+        <v-list-item class="px-4 py-2" title="Menu" />
+
         <v-divider></v-divider>
 
-        <v-list-item 
-          to="/dashboard" 
-          link 
-          @click="closeDrawerOnMobile"
-        >
-          <v-list-item-icon><v-icon>mdi-view-dashboard</v-icon></v-list-item-icon>
-          <v-list-item-content v-if="!mini">
-            <v-list-item-title>Dashboard</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item 
-          to="/fornecedores/fornecedores" 
-          link 
-          @click="closeDrawerOnMobile"
-        >
-          <v-list-item-icon><v-icon>mdi-truck</v-icon></v-list-item-icon>
-          <v-list-item-content v-if="!mini">
-            <v-list-item-title>Fornecedores</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item 
-          to="/insumos/insumos" 
-          link 
-          @click="closeDrawerOnMobile"
-        >
-          <v-list-item-icon><v-icon>mdi-package-variant</v-icon></v-list-item-icon>
-          <v-list-item-content v-if="!mini">
-            <v-list-item-title>Insumos</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item @click="logout" link>
-          <v-list-item-icon><v-icon>mdi-logout</v-icon></v-list-item-icon>
-          <v-list-item-content v-if="!mini">
-            <v-list-item-title>Sair</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
+        <v-list-item to="/dashboard" link @click="closeDrawerOnMobile" prepend-icon="mdi-view-dashboard"
+          title="Dashboard" color="primary" />
+        <v-list-item to="/fornecedores/fornecedores" link @click="closeDrawerOnMobile" prepend-icon="mdi-truck"
+          title="Fornecedores" color="primary" />
+        <v-list-item to="/insumos/insumos" link @click="closeDrawerOnMobile" prepend-icon="mdi-package-variant"
+          title="Insumos" color="primary" />
       </v-list>
+      <template v-slot:append>
+        <div class="pa-2">
+          <v-btn @click="logout" prepend-icon="mdi-logout" variant="outlined" block color="primary">
+            Sair
+          </v-btn>
+        </div>
+      </template>
     </v-navigation-drawer>
 
     <v-app-bar app color="primary" dark>
@@ -83,7 +46,6 @@ const { logout: doLogout } = useAuth();
 const { mobile } = useDisplay();
 
 const drawer = ref(false); 
-const mini = ref(false);
 
 function toggleDrawer() {
   drawer.value = !drawer.value;
