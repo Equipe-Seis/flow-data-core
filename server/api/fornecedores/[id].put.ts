@@ -8,92 +8,70 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'ID inválido.' })
   }
 
-  let dataNascimento = null
-  let abertura = null
-
-  // Função para converter datas do formato BR para ISO
-  const convertToISO = (dataBr: string) => {
-    const [day, month, year] = dataBr.split('/').map(Number)
-    if (!day || !month || !year) throw new Error('Data inválida')
-    return new Date(year, month - 1, day).toISOString()
+  function isISODateOnly(str: string): boolean {
+    return /^\d{4}-\d{2}-\d{2}$/.test(str);
   }
 
-  // Validação e conversão de datas
+  function convertBrToFullISOString(str: string): string {
+    const [day, month, year] = str.split('/').map(Number);
+    if (!day || !month || !year) {
+      throw new Error('Data inválida');
+    }
+    return new Date(Date.UTC(year, month - 1, day)).toISOString(); // sempre UTC
+  }
+
+  function convertIsoToFullISOString(str: string): string {
+    const [year, month, day] = str.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day)).toISOString();
+  }
+
   if (body.tipoPessoa === 'Física' && body.dataNascimento) {
     try {
-      dataNascimento = convertToISO(body.dataNascimento)
+      body.dataNascimento = isISODateOnly(body.dataNascimento)
+        ? convertIsoToFullISOString(body.dataNascimento)
+        : convertBrToFullISOString(body.dataNascimento)
     } catch {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Formato de data de nascimento inválido. Use o formato DD/MM/YYYY.',
-      })
+        statusMessage: 'Formato de data de nascimento inválido. Use DD/MM/YYYY.',
+      });
     }
   }
 
-  if (body.tipoPessoa === 'Jurídica') {
-    if (!body.abertura) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Abertura é um campo obrigatório para pessoa jurídica.',
-      })
-    }
-
+  if (body.tipoPessoa === 'Jurídica' && body.abertura) {
     try {
-      abertura = convertToISO(body.abertura)
+      body.abertura = isISODateOnly(body.abertura)
+        ? convertIsoToFullISOString(body.abertura)
+        : convertBrToFullISOString(body.abertura)
     } catch {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Formato de data de abertura inválido. Use o formato DD/MM/YYYY.',
-      })
+        statusMessage: 'Formato de data de abertura inválido. Use DD/MM/YYYY.',
+      });
     }
   }
 
-  // Atualiza as datas convertidas no body
-  body.dataNascimento = dataNascimento
-  body.abertura = abertura
-
-  // Normaliza CPF e CNPJ
   body.cpf = body.cpf?.replace(/\D/g, '') || null
   body.cnpj = body.cnpj?.replace(/\D/g, '') || null
 
-  // Verificação de unicidade CNPJ
   if (body.tipoPessoa === 'Jurídica' && body.cnpj) {
-    const outroComCnpj = await prisma.fornecedor.findFirst({
-      where: {
-        cnpj: body.cnpj,
-        id: { not: Number(id) },
-      },
+    const duplicado = await prisma.fornecedor.findFirst({
+      where: { cnpj: body.cnpj, id: { not: Number(id) } },
     })
-
-    if (outroComCnpj) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'CNPJ já está em uso por outro fornecedor.',
-      })
+    if (duplicado) {
+      throw createError({ statusCode: 400, statusMessage: 'CNPJ já está em uso.' })
     }
-
-    // Limpa campos de pessoa física
     body.cpf = null
     body.dataNascimento = null
   }
 
-  // Verificação de unicidade CPF
   if (body.tipoPessoa === 'Física' && body.cpf) {
-    const outroComCpf = await prisma.fornecedor.findFirst({
-      where: {
-        cpf: body.cpf,
-        id: { not: Number(id) },
-      },
+    const duplicado = await prisma.fornecedor.findFirst({
+      where: { cpf: body.cpf, id: { not: Number(id) } },
     })
-
-    if (outroComCpf) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'CPF já está em uso por outro fornecedor.',
-      })
+    if (duplicado) {
+      throw createError({ statusCode: 400, statusMessage: 'CPF já está em uso.' })
     }
-
-    // Limpa campos de pessoa jurídica
     body.cnpj = null
     body.abertura = null
   }
@@ -112,7 +90,7 @@ export default defineEventHandler(async (event) => {
       data: { ...body },
     })
 
-    return fornecedorAtualizado
+    return fornecedorAtualizado;
   } catch (err) {
     console.error('Erro ao atualizar fornecedor:', err)
     throw createError({ statusCode: 500, statusMessage: 'Erro ao atualizar fornecedor.' })

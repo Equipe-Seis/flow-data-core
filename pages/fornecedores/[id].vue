@@ -8,7 +8,7 @@
       <v-select
         v-model="fornecedor.tipoPessoa"
         :items="tiposPessoa"
-        label="Tipo de Pessoa"
+        label="* Tipo de Pessoa"
         :rules="[v => !!v || 'Tipo de pessoa é obrigatório']"
         required
         class="mb-4"
@@ -18,13 +18,13 @@
       <template v-if="fornecedor.tipoPessoa === 'Física'">
         <v-text-field
           v-model="fornecedor.nome"
-          label="Nome Completo"
+          label="* Nome Completo"
           :rules="[v => !!v || 'Nome é obrigatório']"
           required
         />
         <v-text-field
           v-model="fornecedor.cpf"
-          label="CPF"
+          label="* CPF"
           v-maska
           data-maska="###.###.###-##"
           :rules="[v => /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(v) || 'CPF inválido']"
@@ -32,7 +32,7 @@
         />
         <v-text-field
           v-model="fornecedor.dataNascimento"
-          label="Data de Nascimento"
+          label="* Data de Nascimento"
           v-maska
           data-maska="##/##/####"
           :rules="[
@@ -43,7 +43,7 @@
         />
         <v-text-field
           v-model="fornecedor.telefone"
-          label="Telefone"
+          label="* Telefone"
           v-maska
           data-maska="(##) #####-####"
           :rules="[v => !!v || 'Telefone é obrigatório']"
@@ -54,7 +54,7 @@
       <template v-else>
         <v-text-field
           v-model="fornecedor.cnpj"
-          label="CNPJ"
+          label="* CNPJ"
           v-maska
           data-maska="##.###.###/####-##"
           :rules="[validateCNPJ]"
@@ -66,11 +66,11 @@
             </v-btn>
           </template>
         </v-text-field>
-        <v-text-field v-model="fornecedor.nome" label="Razão Social" :rules="[v => !!v || 'Razão Social é obrigatória']" readonly />
-        <v-text-field v-model="fornecedor.fantasia" label="Nome Fantasia" readonly />
+        <v-text-field v-model="fornecedor.nome" label="* Razão Social" :rules="[v => !!v || 'Razão Social é obrigatória']"  />
+        <v-text-field v-model="fornecedor.fantasia" label="Nome Fantasia"  />
         <v-text-field
           v-model="fornecedor.telefone"
-          label="Telefone"
+          label="* Telefone"
           v-maska
           data-maska="(##) #####-####"
           :rules="[v => !!v || 'Telefone é obrigatório']"
@@ -85,7 +85,7 @@
 
       <v-text-field
         v-model="fornecedor.email"
-        label="E-mail"
+        label="* E-mail"
         type="email"
         :rules="[v => !!v || 'E-mail é obrigatório', validarEmail]"
         required
@@ -97,7 +97,7 @@
       <h2 class="text-h6 mb-4">Endereço</h2>
       <v-text-field
         v-model="fornecedor.cep"
-        label="CEP"
+        label="* CEP"
         v-maska
         data-maska="#####-###"
         :rules="[v => !!v || 'CEP é obrigatório', v => /^\d{5}-\d{3}$/.test(v) || 'CEP inválido']"
@@ -111,13 +111,13 @@
       </v-text-field>
       <v-text-field
         v-model="fornecedor.logradouro"
-        label="Logradouro"
+        label="* Logradouro"
         :rules="[v => !!v || 'Logradouro é obrigatório']"
         required
       />
       <v-text-field
         v-model="fornecedor.bairro"
-        label="Bairro"
+        label="* Bairro"
         :rules="[v => !!v || 'Bairro é obrigatório']"
         required
       />
@@ -125,8 +125,8 @@
       <v-select
         v-model="fornecedor.uf"
         :items="estados.map(e => e.sigla)"
-        label="UF"
-        @update:modelValue="onEstadoChange"
+        label="* UF"
+        @update:modelValue="uf => onEstadoChange(uf, true)"
         :rules="[v => !!v || 'UF é obrigatório']"
         required
       />
@@ -134,7 +134,7 @@
       <v-select
         v-model="fornecedor.localidade"
         :items="cidades.map(c => c.nome)"
-        label="Cidade"
+        label="* Cidade"
         :disabled="cidadeDisabled || cidades.length === 0"
         :rules="[v => !!v || 'Cidade é obrigatória']"
         required
@@ -203,10 +203,10 @@ const validateCNPJ = v => {
 };
 
 const formatDateBR = iso => {
-  if (!iso) return ''
-  const d = new Date(iso)
-  return [d.getDate(), d.getMonth() + 1, d.getFullYear()].map(n => String(n).padStart(2, '0')).join('/')
-}
+  if (!iso) return '';
+  const [year, month, day] = iso.split('T')[0].split('-');
+  return `${day}/${month}/${year}`;
+};
 
 const resetPessoaFields = (newType) => {
   if (newType === 'Física') {
@@ -330,24 +330,31 @@ const carregarEstados = async () => {
   }
 };
 
-const onEstadoChange = async uf => {
-  fornecedor.localidade = '';
+const onEstadoChange = async (uf, limparLocalidade = false) => {
+  if (limparLocalidade) {
+    fornecedor.localidade = '';
+  }
+
   cidades.value = [];
   cidadeDisabled.value = true;
 
-  if (!uf) return
+  if (!uf) return;
 
   try {
-    const data = await $fetch(
-      `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`
-    )
-    cidades.value = data.sort((a, b) => a.nome.localeCompare(b.nome))
-    cidadeDisabled.value = false
+    const data = await $fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${uf}/municipios`);
+    cidades.value = data.sort((a, b) => a.nome.localeCompare(b.nome));
+    cidadeDisabled.value = false;
+
+    const cidadeExiste = cidades.value.find(c => c.nome === fornecedor.localidade);
+    if (!cidadeExiste) {
+      fornecedor.localidade = '';
+    }
   } catch (err) {
     erro.value = 'Erro ao carregar cidades para este estado.';
     console.error(err);
   }
-}
+};
+
 
 onMounted(async () => {
   await carregarEstados();

@@ -58,10 +58,10 @@ export default defineEventHandler(async (event) => {
   }
 
   if (body.tipoPessoa === "Jurídica" && !body.abertura) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "Abertura é um campo obrigatório para pessoa jurídica.",
-    });
+    //throw createError({
+      //statusCode: 400,
+      //statusMessage: "Abertura é um campo obrigatório para pessoa jurídica.",
+    //});
   }
 
   if (body.tipoPessoa === "Jurídica" && body.abertura) {

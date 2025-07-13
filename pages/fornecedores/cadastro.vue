@@ -5,31 +5,31 @@
 		<v-alert v-if="erro" type="error" class="mb-5">{{ erro }}</v-alert>
 
 		<v-form ref="form" @submit.prevent="onSubmit" v-model="valid" lazy-validation>
-			<v-select v-model="fornecedor.tipoPessoa" :items="tiposPessoa" label="Tipo de Pessoa"
+			<v-select v-model="fornecedor.tipoPessoa" :items="tiposPessoa" label="* Tipo de Pessoa"
 				:rules="[v => !!v || 'Tipo de pessoa é obrigatório']" required class="mb-4"
 				@update:modelValue="resetPessoaFields" />
 
 			<template v-if="fornecedor.tipoPessoa === 'Física'">
 				<v-row>
 					<v-col cols="12">
-						<v-text-field v-model="fornecedor.nome" label="Nome Completo"
+						<v-text-field v-model="fornecedor.nome" label="* Nome Completo"
 							:rules="[v => !!v || 'Nome é obrigatório']" required />
 					</v-col>
 					<v-col cols="12" sm="6">
-						<v-text-field v-model="fornecedor.cpf" label="CPF" v-mask="'###.###.###-##'"
+						<v-text-field v-model="fornecedor.cpf" label="* CPF" v-mask="'###.###.###-##'"
 							:rules="[v => !!v || 'CPF é obrigatório', v => /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(v) || 'CPF inválido']"
 							required />
 					</v-col>
 					<v-col cols="12" sm="6">
-						<v-text-field v-model="fornecedor.dataNascimento" label="Data de Nascimento"
+						<v-text-field v-model="fornecedor.dataNascimento" label="* Data de Nascimento"
 							v-mask="'##/##/####'" :rules="birth_date_rule" required />
 					</v-col>
 					<v-col cols="12" sm="6">
-						<v-text-field v-model="fornecedor.telefone" label="Telefone" v-mask="'(##) #####-####'"
+						<v-text-field v-model="fornecedor.telefone" label="* Telefone" v-mask="'(##) #####-####'"
 							:rules="[v => !!v || 'Telefone é obrigatório']" required />
 					</v-col>
 					<v-col cols="12" sm="6">
-						<v-text-field v-model="fornecedor.email" label="E-mail" type="email"
+						<v-text-field v-model="fornecedor.email" label="* E-mail" type="email"
 							:rules="[v => !!v || 'E-mail é obrigatório', validarEmail]" required clearable />
 					</v-col>
 				</v-row>
@@ -38,7 +38,7 @@
 			<template v-else>
 				<v-row>
 					<v-col cols="12" sm="8">
-						<v-text-field v-model="fornecedor.cnpj" label="CNPJ" v-mask="'##.###.###/####-##'"
+						<v-text-field v-model="fornecedor.cnpj" label="* CNPJ" v-mask="'##.###.###/####-##'"
 							:rules="[validateCNPJ]" required>
 							<template #append-inner>
 								<v-btn icon @click="consultarCnpj" :loading="carregandoCnpj" color="primary"
@@ -52,18 +52,18 @@
 						<v-text-field v-model="fornecedor.abertura" label="Data de Abertura" :readonly="true" />
 					</v-col>
 					<v-col cols="12" sm="8">
-						<v-text-field v-model="fornecedor.nome" label="Razão Social" :readonly="true"
+						<v-text-field v-model="fornecedor.nome" label="* Razão Social"
 							:rules="[v => !!v || 'Razão Social é obrigatória']" required />
 					</v-col>
 					<v-col cols="12" sm="4">
-						<v-text-field v-model="fornecedor.fantasia" label="Nome Fantasia" :readonly="true" />
+						<v-text-field v-model="fornecedor.fantasia" label="Nome Fantasia" />
 					</v-col>
 					<v-col cols="12" sm="6">
-						<v-text-field v-model="fornecedor.telefone" label="Telefone" v-mask="'(##) #####-####'"
+						<v-text-field v-model="fornecedor.telefone" label="* Telefone" v-mask="'(##) #####-####'"
 							:rules="[v => !!v || 'Telefone é obrigatório']" required />
 					</v-col>
 					<v-col cols="12" sm="6">
-						<v-text-field v-model="fornecedor.email" label="E-mail" type="email"
+						<v-text-field v-model="fornecedor.email" label="* E-mail" type="email"
 							:rules="[v => !!v || 'E-mail é obrigatório', validarEmail]" required clearable />
 					</v-col>
 					<v-col cols="12" sm="6">
@@ -87,7 +87,7 @@
 
 			<v-row>
 				<v-col cols="12" sm="6">
-					<v-text-field v-model="fornecedor.cep" label="CEP" v-mask="'#####-###'"
+					<v-text-field v-model="fornecedor.cep" label="* CEP" v-mask="'#####-###'"
 						:rules="[v => !!v || 'CEP é obrigatório', v => /^\d{5}-\d{3}$/.test(v) || 'CEP inválido']"
 						required>
 						<template #append-inner>
@@ -98,19 +98,19 @@
 					</v-text-field>
 				</v-col>
 				<v-col cols="12" sm="6">
-					<v-text-field v-model="fornecedor.logradouro" label="Logradouro"
+					<v-text-field v-model="fornecedor.logradouro" label="* Logradouro"
 						:rules="[v => !!v || 'Logradouro é obrigatório']" required />
 				</v-col>
 				<v-col cols="12" sm="6">
-					<v-text-field v-model="fornecedor.bairro" label="Bairro"
+					<v-text-field v-model="fornecedor.bairro" label="* Bairro"
 						:rules="[v => !!v || 'Bairro é obrigatório']" required />
 				</v-col>
 				<v-col cols="12" sm="6">
-					<v-select v-model="fornecedor.uf" :items="estados.map(e => e.sigla)" label="UF"
+					<v-select v-model="fornecedor.uf" :items="estados.map(e => e.sigla)" label="* UF"
 						:rules="[v => !!v || 'UF é obrigatório']" @update:modelValue="onEstadoChange" required />
 				</v-col>
 				<v-col cols="12" sm="6">
-					<v-select v-model="fornecedor.localidade" :items="cidades.map(c => c.nome)" label="Cidade"
+					<v-select v-model="fornecedor.localidade" :items="cidades.map(c => c.nome)" label="* Cidade"
 						:disabled="cidadeDisabled || cidades.length === 0" :rules="[v => !!v || 'Cidade é obrigatória']"
 						required />
 				</v-col>
