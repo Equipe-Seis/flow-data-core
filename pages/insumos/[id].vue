@@ -2,49 +2,31 @@
   <v-container>
     <h1>Editar Insumo</h1>
 
-        <v-alert v-if="erro" type="error" class="mb-4">{{ erro }}</v-alert>
+    <v-alert v-if="erro" type="error" class="mb-4">{{ erro }}</v-alert>
 
-        <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSubmit">
-          <v-text-field
-            v-model="insumo.nome"
-            label="Nome"
-            :rules="[v => !!v || 'Nome é obrigatório']"
-            required
-          />
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="onSubmit">
+      <v-text-field v-model="insumo.nome" label="Nome" :rules="[v => !!v || 'Nome é obrigatório']" required />
 
-          <v-text-field
-            v-model="insumo.codigo"
-            label="Código"
-            :rules="[v => !!v || 'Código é obrigatório']"
-            required
-          />
+      <v-text-field v-model="insumo.codigo" label="Código" :rules="[v => !!v || 'Código é obrigatório']" required />
 
-          <v-text-field
-            v-model="insumo.descricao"
-            label="Descrição"
-            :rules="[v => !!v || 'Descrição é obrigatória']"
-          />
+      <v-text-field v-model="insumo.descricao" label="Descrição" :rules="[v => !!v || 'Descrição é obrigatória']" />
 
-          <v-text-field
-            v-model.number="insumo.quantidade"
-            label="Quantidade mínima de estoque"
-            type="number"
-            :rules="[v => v >= 0 || 'Quantidade deve ser positiva']"
-          />
+      <v-text-field v-model.number="insumo.quantidade" label="Quantidade mínima de estoque" type="number"
+        :rules="[v => v >= 0 || 'Quantidade deve ser positiva']" />
 
-          <v-text-field
-            v-model.number="insumo.preco"
-            label="Preço"
-            type="number"
-            prefix="R$"
-            :rules="[v => v >= 0 || 'Preço deve ser positivo']"
-          />
+      <v-text-field v-model.number="insumo.preco" label="Preço" type="number" prefix="R$"
+        :rules="[v => v >= 0 || 'Preço deve ser positivo']" />
 
-          <v-btn color="primary" type="submit" class="mt-4">
-            Salvar Alterações
-          </v-btn>
-        </v-form>
-     
+      <div class="d-flex justify-end ga-4">
+        <v-btn class="me-2" @click="router.back()">
+          Voltar
+        </v-btn>
+        <v-btn type="submit" color="primary" :disabled="!valid" :loading="carregandoSubmit">
+          Salvar Alterações
+        </v-btn>
+      </div>
+    </v-form>
+
   </v-container>
 </template>
 
