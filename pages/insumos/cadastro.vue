@@ -8,63 +8,38 @@
 
       <v-row>
         <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="insumo.nome"
-            label="Nome"
-            :rules="[v => !!v || 'Nome é obrigatório']"
-            required
-          />
+          <v-text-field v-model="insumo.nome" label="Nome" :rules="[v => !!v || 'Nome é obrigatório']" required />
         </v-col>
         <v-col cols="12" sm="6">
-          <v-text-field
-            v-model="insumo.codigo"
-            label="Código"
-            :rules="[v => !!v || 'Código é obrigatório']"
-            required
-          />
+          <v-text-field v-model="insumo.codigo" label="Código" :rules="[v => !!v || 'Código é obrigatório']" required />
         </v-col>
       </v-row>
 
-      <v-text-field
-        label="Descrição"
-        v-model="insumo.descricao"
-        :rules="[v => !!v || 'Descrição é obrigatória']"
-      ></v-text-field>
+      <v-text-field label="Descrição" v-model="insumo.descricao"
+        :rules="[v => !!v || 'Descrição é obrigatória']"></v-text-field>
 
       <v-row>
         <v-col cols="12" sm="6">
-          <v-text-field
-            label="Quantidade mínima de estoque"
-            v-model.number="insumo.quantidade"
-            type="number"
-            :rules="[
-              v => v !== null && v !== '' || 'Quantidade é obrigatória',
-              v => (v === null || v === '' || v >= 0) || 'Quantidade não pode ser negativa'
-            ]"
-            required
-          ></v-text-field>
+          <v-text-field label="Quantidade mínima de estoque" v-model.number="insumo.quantidade" type="number" :rules="[
+            v => v !== null && v !== '' || 'Quantidade é obrigatória',
+            v => (v === null || v === '' || v >= 0) || 'Quantidade não pode ser negativa'
+]" required></v-text-field>
         </v-col>
         <v-col cols="12" sm="6">
-          <v-text-field
-            label="Preço"
-            v-model.number="insumo.preco"
-            type="number"
-            prefix="R$"
-            :rules="[
-              v => v !== null && v !== '' || 'Preço é obrigatório',
-              v => (v === null || v === '' || v >= 0) || 'Preço não pode ser negativo'
-            ]"
-            required
-          ></v-text-field>
+          <v-text-field label="Preço" v-model.number="insumo.preco" type="number" prefix="R$" :rules="[
+            v => v !== null && v !== '' || 'Preço é obrigatório',
+            v => (v === null || v === '' || v >= 0) || 'Preço não pode ser negativo'
+          ]" required></v-text-field>
         </v-col>
       </v-row>
-
-      <v-btn color="primary" type="submit" class="mt-4" :loading="carregando">
-        Cadastrar
-      </v-btn>
-      <v-btn color="text-accent" class="mt-4 ms-2" @click="router.back()">
-        Voltar
-      </v-btn>
+      <div class="d-flex justify-end ga-4">
+        <v-btn class="me-2" @click="router.back()">
+          Cancelar
+        </v-btn>
+        <v-btn type="submit" color="primary" :disabled="!valid" :loading="carregandoSubmit">
+          Cadastrar
+        </v-btn>
+      </div>
     </v-form>
   </v-container>
 </template>

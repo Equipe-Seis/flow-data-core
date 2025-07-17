@@ -1,0 +1,285 @@
+@startuml
+Bob -> Alice : hello
+
+
+abstract class Item {
+  +id: int
+  +nome: string
+  +codigo: string
+  +tipo: string
+  +descricao: string
+  +unidadeMedida: string
+  +status:enum('ATIVO', 'INATIVO')
+}
+
+class Produto{
+    +valorUnitario: decimal
+}
+
+class Insumo{
+    +quantidadeMinima: float
+}
+
+class AvaliacaoFornecedor {
+  +id: int
+  +data: DateTime
+  +nota: float <<0.0 a 5.0>>
+  +comentario: string
+  +fornecedor: Fornecedor
+  +responsavel: Usuario
+  +criterios: CriterioAvaliacaoFornecedor[]
+}
+
+class CriterioAvaliacaoFornecedor {
+  +id: int
+  +criterio: enum('QUALIDADE', 'PRAZO', 'ATENDIMENTO', 'PRECOS')
+  +nota: int enum('RUIM', 'ADEQUADO', 'BOM', 'EXCELENTE')
+  +observacao: string
+}
+
+class SolicitacaoEstoque {
+  +id: int
+  +dataSolicitacao: DateTime
+  +dataAtualizacao: DateTime
+  +status: enum('PENDENTE', 'APROVADA', 'REJEITADA', 'FINALIZADA')
+  +observacoes: string
+  +solicitante: Usuario
+  +producao: Producao
+  +itens: SolicitacaoItem[]
+  +movimentacao: Movimentacao
+}
+
+class EstoqueItem {
+  +id: int
+  +quantidade: double
+  +dataAtualizacao: DateTime
+  +item: Item
+  +localEstoque: LocalEstoque
+}
+
+class SolicitacaoCompra {
+  +id: int
+  +dataSolicitacao: DateTime
+  +dataAtualizacao: DateTime
+  +status: enum('PENDENTE', 'APROVADO', 'REPROVADO')
+  +observacoes: string
+  +responsavel: Usuario
+  itens: SolicitacaoItem[]
+}
+
+class SolicitacaoItem {
+  +id: int
+  +quantidadeSolicitada: double
+  +quantidadeAtendida: double
+  +status: enum('PENDENTE', 'PARCIAL', 'ATENDIDA', 'CANCELADA')
+}
+
+class LocalEstoque {
+  +id: int
+  +nome: string
+  +descricao: string
+  +ativo: bool
+  itens: EstoqueItem[]
+}
+
+class Endereco {
+  +id:int
+  +logradouro: string
+  +numero: string
+  +complemento: string
+  +bairro: string
+  +cidade:int
+  +estado:int
+  +cep: string
+  +pais:int
+  +principal: bool
+}
+
+
+class Contato {
+  +id:int 
+  +tipo: string
+  +valor: string
+  +observacao: string
+  +principal: bool
+}
+
+abstract class Pessoa {
+  +id:int 
+  +nome: string
+  +tipoPessoa: string <<enum>>  ' FISICA, JURIDICA
+  +cpfCnpj: string
+  +status:enum('ATIVO', 'INATIVO')
+  +contatos: Contato
+  +enderecos: Endereco
+}
+
+class Cliente {
+  +id: int
+  +limiteDeCredito: double
+  +pessoa: Pessoa
+}
+
+class Fornecedor {
+  +id: int
+  +inscMunicipal: string
+  +inscEstadual: string
+  +regimeTributario: String
+  +pessoa: Pessoa
+}
+
+class Usuario {
+  +id: int
+  +email: string
+  +senhaHash: string
+  +status:enum('ATIVO', 'INATIVO')
+  +pessoa: Pessoa
+  +perfil: Perfil[]
+}
+
+class Perfil {
+  +id: int
+  +nome: string
+  +descricao: string
+  +Permissoes: Permissao[]
+}
+
+class Permissao {
+  +id: int
+  +nome: string
+  +descricao: string
+}
+
+class Movimentacao {
+  +id: int
+  +tipo: enum(ENTRADA, SAIDA)
+  +dataAtualizacao: DateTime
+  +status: enum('EXECUTADA', 'REVERTIDA', )
+  +observacoes: string
+  +itens: MovimentacaoItem[]
+  +executor: Usuario
+}
+
+class MovimentacaoItem {
+  +quantidade: double
+  +item: Item
+}
+
+
+class Producao {
+  +id: int
+  +dataAtualizacao: DateTime
+  +dataHoraInicio: DateTime
+  +dataHoraFim: DateTime
+  +status: enum('PLANEJADA', 'EM_EXECUCAO', 'FINALIZADA')
+  +observacoes: string
+  +responsavel: Usuario
+  +itens: ProducaoItem[]
+}
+
+class ProducaoItem {
+  +tipo
+  +quantidade: double
+  +item: Item
+}
+
+class Compra {
+  +id: int
+  +dataAtualizacao: DateTime
+  +status
+  +valorTotal: decimal
+  +notaFiscal: string
+  +observacoes: string
+  +fornecedor: Fornecedor
+  +responsavel: Usuario
+  +itens: TransacaoItem[]
+  +solicitacao: SolicitacaoCompra
+}
+
+class Venda {
+  +id: int
+  +dataAtualizacao: DateTime
+  +status
+  +valorTotal: decimal
+  +notaFiscal: string
+  +observacoes: string
+  +responsavel: Usuario
+  +cliente: Cliente
+  +itens: TransacaoItem[]
+}
+
+class TransacaoItem {
+  +quantidade: double
+  +valorUnitario: decimal
+  +tipo: enum('COMPRA', 'VENDA')
+  +item: Item
+}
+
+class AnaliseQualidade {
+  +id: int
+  +dataAtualizacao: DateTime
+  +observacoes: string
+  +responsavel: Usuario
+  +producao: Producao
+  +resultados: AnaliseResultado[]
+}
+
+class AnaliseResultado {
+  +id: int
+  +resultado: enum('APROVADO', 'REPROVADO')
+  +observacoes: string
+  +item: Item
+}
+
+Item <|-- Produto
+Item <|-- Insumo
+
+Movimentacao o-- MovimentacaoItem : contém
+Movimentacao --> Usuario : executor
+MovimentacaoItem --> Item : utiliza
+
+SolicitacaoCompra --> Usuario : responsável
+SolicitacaoCompra "0..1" <-- "*" Compra : originada de
+SolicitacaoCompra o-- SolicitacaoItem : contém
+
+Usuario "1" o-- "*" Perfil : contém
+Perfil "1" o-- "*" Permissao : contém
+
+Pessoa "0..1" <-- "1" Usuario : refere-se a
+Pessoa "0..1" <-- "1" Fornecedor : refere-se a
+Pessoa "0..1" <-- "1" Cliente : refere-se a
+Pessoa "1" -up-> "0..*" Endereco : possui
+Pessoa "1" -up-> "0..*" Contato : possui
+
+Producao o-- ProducaoItem : contém
+Producao --> Usuario : responsável
+
+Compra o-- TransacaoItem : contém
+Compra --> Usuario : responsável
+Compra --> Fornecedor : de
+
+Venda o-- TransacaoItem : contém
+Venda --> Usuario : responsável
+
+ProducaoItem --> Item : utiliza
+TransacaoItem --> Item : utiliza
+
+LocalEstoque "1" -up-> "0..*" EstoqueItem : contém
+
+AnaliseQualidade "1" --> "1" Usuario : responsável
+AnaliseQualidade "1" --> "1" Producao : refere-se a
+AnaliseQualidade "1" o-- "0..*" AnaliseResultado : contém
+AnaliseResultado "1" --> "1" Item : avalia
+
+Fornecedor "1" <-- "0..*" AvaliacaoFornecedor : avaliado por
+AvaliacaoFornecedor --> Usuario : feita por
+AvaliacaoFornecedor o-- CriterioAvaliacaoFornecedor : composta por
+
+SolicitacaoEstoque --> Usuario : solicitada por
+SolicitacaoEstoque --> Producao : para produção
+SolicitacaoEstoque o-- SolicitacaoItem : contém
+SolicitacaoEstoque --> Movimentacao : atende via
+
+SolicitacaoItem "1" --> "1" Item: Possui
+EstoqueItem "0..*" --> "1" Item: Possui
+@enduml

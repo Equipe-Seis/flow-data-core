@@ -22,9 +22,15 @@
       </template>
     </v-navigation-drawer>
 
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="background" class="text-accent" style="border-bottom: 2px solid;">
       <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>Área Administrativa</v-toolbar-title>
+      <v-toolbar-title @click="navigateTo('/dashboard')" class="font-weight-bold">FlowData</v-toolbar-title>
+      <template v-slot:append>
+        <div class="d-flex align-center ga-3 px-2">
+          <p>Olá, Jane Doe</p>
+          <v-btn icon="mdi-logout" color="accent" @click="logout"></v-btn>
+        </div>
+      </template>
     </v-app-bar>
 
     <v-main>
@@ -40,6 +46,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuth } from '~/composables/useAuth';
 import { useDisplay } from 'vuetify';
+import { navigateTo } from 'nuxt/app';
 
 const router = useRouter();
 const { logout: doLogout } = useAuth();

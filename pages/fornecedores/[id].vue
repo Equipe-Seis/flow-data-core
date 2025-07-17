@@ -5,77 +5,38 @@
     <v-alert v-if="erro" type="error" class="mt-2 mb-4">{{ erro }}</v-alert>
 
     <v-form ref="form" @submit.prevent="onSubmit" v-model="valid" lazy-validation>
-      <v-select
-        v-model="fornecedor.tipoPessoa"
-        :items="tiposPessoa"
-        label="* Tipo de Pessoa"
-        :rules="[v => !!v || 'Tipo de pessoa é obrigatório']"
-        required
-        class="mb-4"
-        @update:modelValue="resetPessoaFields"
-      />
+      <v-select v-model="fornecedor.tipoPessoa" :items="tiposPessoa" label="* Tipo de Pessoa"
+        :rules="[v => !!v || 'Tipo de pessoa é obrigatório']" required class="mb-4"
+        @update:modelValue="resetPessoaFields" />
 
       <template v-if="fornecedor.tipoPessoa === 'Física'">
-        <v-text-field
-          v-model="fornecedor.nome"
-          label="* Nome Completo"
-          :rules="[v => !!v || 'Nome é obrigatório']"
-          required
-        />
-        <v-text-field
-          v-model="fornecedor.cpf"
-          label="* CPF"
-          v-maska
-          data-maska="###.###.###-##"
-          :rules="[v => /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(v) || 'CPF inválido']"
-          required
-        />
-        <v-text-field
-          v-model="fornecedor.dataNascimento"
-          label="* Data de Nascimento"
-          v-maska
-          data-maska="##/##/####"
+        <v-text-field v-model="fornecedor.nome" label="* Nome Completo" :rules="[v => !!v || 'Nome é obrigatório']"
+          required />
+        <v-text-field v-model="fornecedor.cpf" label="* CPF" v-maska data-maska="###.###.###-##"
+          :rules="[v => /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(v) || 'CPF inválido']" required />
+        <v-text-field v-model="fornecedor.dataNascimento" label="* Data de Nascimento" v-maska data-maska="##/##/####"
           :rules="[
             v => !!v || 'Data de Nascimento é obrigatória',
             v => /^\d{2}\/\d{2}\/\d{4}$/.test(v) || 'Formato de data inválido (DD/MM/AAAA)'
-          ]"
-          required
-        />
-        <v-text-field
-          v-model="fornecedor.telefone"
-          label="* Telefone"
-          v-maska
-          data-maska="(##) #####-####"
-          :rules="[v => !!v || 'Telefone é obrigatório']"
-          required
-        />
+]" required />
+        <v-text-field v-model="fornecedor.telefone" label="* Telefone" v-maska data-maska="(##) #####-####"
+          :rules="[v => !!v || 'Telefone é obrigatório']" required />
       </template>
 
       <template v-else>
-        <v-text-field
-          v-model="fornecedor.cnpj"
-          label="* CNPJ"
-          v-maska
-          data-maska="##.###.###/####-##"
-          :rules="[validateCNPJ]"
-          required
-        >
+        <v-text-field v-model="fornecedor.cnpj" label="* CNPJ" v-maska data-maska="##.###.###/####-##"
+          :rules="[validateCNPJ]" required>
           <template #append-inner>
             <v-btn icon @click="consultarCnpj" :loading="carregandoCnpj" color="primary" aria-label="Consultar CNPJ">
               <v-icon>mdi-magnify</v-icon>
             </v-btn>
           </template>
         </v-text-field>
-        <v-text-field v-model="fornecedor.nome" label="* Razão Social" :rules="[v => !!v || 'Razão Social é obrigatória']"  />
-        <v-text-field v-model="fornecedor.fantasia" label="Nome Fantasia"  />
-        <v-text-field
-          v-model="fornecedor.telefone"
-          label="* Telefone"
-          v-maska
-          data-maska="(##) #####-####"
-          :rules="[v => !!v || 'Telefone é obrigatório']"
-          required
-        />
+        <v-text-field v-model="fornecedor.nome" label="* Razão Social"
+          :rules="[v => !!v || 'Razão Social é obrigatória']" />
+        <v-text-field v-model="fornecedor.fantasia" label="Nome Fantasia" />
+        <v-text-field v-model="fornecedor.telefone" label="* Telefone" v-maska data-maska="(##) #####-####"
+          :rules="[v => !!v || 'Telefone é obrigatório']" required />
         <v-text-field v-model="fornecedor.abertura" label="Data de Abertura" readonly />
         <v-text-field v-model="fornecedor.situacao" label="Situação" readonly />
         <v-text-field v-model="fornecedor.tipo" label="Tipo" readonly />
@@ -83,65 +44,33 @@
         <v-text-field v-model="fornecedor.natureza_juridica" label="Natureza Jurídica" readonly />
       </template>
 
-      <v-text-field
-        v-model="fornecedor.email"
-        label="* E-mail"
-        type="email"
-        :rules="[v => !!v || 'E-mail é obrigatório', validarEmail]"
-        required
-        clearable
-      />
+      <v-text-field v-model="fornecedor.email" label="* E-mail" type="email"
+        :rules="[v => !!v || 'E-mail é obrigatório', validarEmail]" required clearable />
 
       <v-divider class="my-4" />
 
       <h2 class="text-h6 mb-4">Endereço</h2>
-      <v-text-field
-        v-model="fornecedor.cep"
-        label="* CEP"
-        v-maska
-        data-maska="#####-###"
-        :rules="[v => !!v || 'CEP é obrigatório', v => /^\d{5}-\d{3}$/.test(v) || 'CEP inválido']"
-        required
-      >
+      <v-text-field v-model="fornecedor.cep" label="* CEP" v-maska data-maska="#####-###"
+        :rules="[v => !!v || 'CEP é obrigatório', v => /^\d{5}-\d{3}$/.test(v) || 'CEP inválido']" required>
         <template #append-inner>
           <v-btn icon @click="consultarCep" :loading="carregandoCep" color="primary" aria-label="Consultar CEP">
             <v-icon>mdi-magnify</v-icon>
           </v-btn>
         </template>
       </v-text-field>
-      <v-text-field
-        v-model="fornecedor.logradouro"
-        label="* Logradouro"
-        :rules="[v => !!v || 'Logradouro é obrigatório']"
-        required
-      />
-      <v-text-field
-        v-model="fornecedor.bairro"
-        label="* Bairro"
-        :rules="[v => !!v || 'Bairro é obrigatório']"
-        required
-      />
+      <v-text-field v-model="fornecedor.logradouro" label="* Logradouro"
+        :rules="[v => !!v || 'Logradouro é obrigatório']" required />
+      <v-text-field v-model="fornecedor.bairro" label="* Bairro" :rules="[v => !!v || 'Bairro é obrigatório']"
+        required />
 
-      <v-select
-        v-model="fornecedor.uf"
-        :items="estados.map(e => e.sigla)"
-        label="* UF"
-        @update:modelValue="uf => onEstadoChange(uf, true)"
-        :rules="[v => !!v || 'UF é obrigatório']"
-        required
-      />
+      <v-select v-model="fornecedor.uf" :items="estados.map(e => e.sigla)" label="* UF"
+        @update:modelValue="uf => onEstadoChange(uf, true)" :rules="[v => !!v || 'UF é obrigatório']" required />
 
-      <v-select
-        v-model="fornecedor.localidade"
-        :items="cidades.map(c => c.nome)"
-        label="* Cidade"
-        :disabled="cidadeDisabled || cidades.length === 0"
-        :rules="[v => !!v || 'Cidade é obrigatória']"
-        required
-      />
+      <v-select v-model="fornecedor.localidade" :items="cidades.map(c => c.nome)" label="* Cidade"
+        :disabled="cidadeDisabled || cidades.length === 0" :rules="[v => !!v || 'Cidade é obrigatória']" required />
 
-      <div class="d-flex justify-end mt-6">
-        <v-btn color="secondary" class="me-2" @click="router.back()">
+      <div class="d-flex justify-end ga-4">
+        <v-btn class="me-2" @click="router.back()">
           Voltar
         </v-btn>
         <v-btn type="submit" color="primary" :disabled="!valid" :loading="carregandoSubmit">

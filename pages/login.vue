@@ -3,50 +3,20 @@
     <div class="image-decor"></div>
 
     <v-container class="d-flex align-center justify-end login-container">
-      <v-card
-        max-width="500"
-        width="100%"
-        class="pa-8 rounded-lg elevation-0 custom-card"
-      >
-        <div class="text-center text-secondary mb-6">
-          <h1 class="text-h2 font-weight-bold">FlowData</h1>
-          <h2 class="text-h6 font-weight-bold">Bem-vindo(a)!</h2>
+      <v-card max-width="500" width="100%" class="pa-8 rounded-lg elevation-0 custom-card">
+        <div class="mb-4 text-center">
+          <p class="font-weight-black text-h4 text-accent">Bem-vindo(a) ao</p>
+          <p class="font-weight-black text-h2 text-secondary">FlowData</p>
         </div>
 
         <v-form ref="form" v-model="valid">
-          <v-text-field
-            v-model="email"
-            label="Usuário:"
-            variant="outlined"
-            density="comfortable"
-            class="mb-4"
-            :rules="emailRules"
-            required
-          />
-          <v-text-field
-            v-model="password"
-            label="Senha:"
-            type="password"
-            variant="outlined"
-            density="comfortable"
-            class="mb-4"
-            :rules="passwordRules"
-            required
-          />
-          <v-checkbox
-            v-model="remember"
-            label="Lembre-se de mim."
-            hide-details
-            class="mb-4"
-          />
-          <v-btn
-            :disabled="!valid"
-            block
-            size="large"
-            class="text-white"
-            style="background-color: #1fcf54"
-            @click="login"
-          >
+          <v-text-field v-model="email" label="Usuário:" variant="outlined" density="comfortable" class="mb-4"
+            :rules="emailRules" required />
+          <v-text-field v-model="password" label="Senha:" type="password" variant="outlined" density="comfortable"
+            class="mb-4" :rules="passwordRules" required />
+          <v-checkbox v-model="remember" label="Lembre-se de mim." hide-details class="mb-4" />
+          <v-btn :disabled="!valid" block size="large" class="text-white" style="background-color: #1fcf54"
+            @click="login">
             Entrar
           </v-btn>
         </v-form>
