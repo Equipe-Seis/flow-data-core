@@ -12,6 +12,8 @@
           title="Fornecedores" color="primary" />
         <v-list-item to="/insumos/insumos" link @click="closeDrawerOnMobile" prepend-icon="mdi-package-variant"
           title="Insumos" color="primary" />
+        <v-list-item to="/estoque/movimentacao_estoque" link @click="closeDrawerOnMobile" prepend-icon="mdi-package-variant-closed"
+          title="Estoque" color="primary" />
       </v-list>
       <template v-slot:append>
         <div class="pa-2">
